@@ -22,6 +22,54 @@ set(CAFFE_TARGET_VERSION "1.0.0" CACHE STRING "Caffe logical version")
 set(CAFFE_TARGET_SOVERSION "1.0.0" CACHE STRING "Caffe soname version")
 add_definitions(-DCAFFE_VERSION=${CAFFE_TARGET_VERSION})
 
+if(USE_CONANFILE)
+  include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+  conan_basic_setup()
+
+  set(CMAKE_PREFIX_PATH
+    ${CMAKE_PREFIX_PATH}
+    ${CONAN_PROTOBUF_ROOT}/cmake
+    ${CONAN_OPENCV_ROOT})
+
+  # Force use HDF5
+  add_compile_definitions(USE_HDF5)
+
+  set(GFLAGS_LIBRARY ${CONAN_LIBS_GFLAGS})
+  set(GLOG_LIBRARY ${CONAN_LIBS_GLOG})
+  set(glog_DIR ${CONAN_LIB_DIRS_GLOG})
+  find_package(Glog REQUIRED)
+  find_package(GFlags REQUIRED)
+
+  # This is needed to force the correct OpenCV to be found
+  set(OpenCV_DIR ${CONAN_OPENCV_ROOT}/cmake/x64/vc16/staticlib)
+  set(OpenCV_LIB_PATH ${CONAN_LIB_DIRS_OPENCV})
+  find_package(OpenCV REQUIRED)
+
+  set(Atlas_INCLUDE_DIR ${CONAN_INCLUDE_DIRS_ATLAS})
+  set(Atlas_LIBRARIES ${CONAN_LIBS_ATLAS})
+  set(Atlas_CLAPACK_INCLUDE_DIR ${CONAN_INCLUDE_DIRS_ATLAS})
+  set(Atlas_CBLAS_LIBRARY ${CONAN_LIBS_ATLAS})
+  set(Atlas_BLAS_LIBRARY ${CONAN_LIBS_ATLAS})
+  set(Atlas_LAPACK_LIBRARY ${CONAN_LIBS_ATLAS})
+  find_package(Atlas REQUIRED)
+
+  include(cmake/Utils.cmake)
+
+  set(Protobuf_LIBRARIES ${CONAN_LIBS_PROTOBUF})
+  set(Protobuf_INCLUDE_DIRS ${CONAN_LIB_DIRS_PROTOBUF})
+  find_package(Protobuf REQUIRED Protobuf_LIBRARIES Protobuf_PROTOC_EXECUTABLE Protobuf_INCLUDE_DIRS)
+  include(cmake/ProtoBuf.cmake)
+
+  find_package(Eigen3 REQUIRED)
+
+  link_libraries(PRIVATE
+    ${CONAN_TARGETS})
+
+else()
+  # ---[ Prebuild dependencies on windows
+  include(cmake/WindowsDownloadPrebuiltDependencies.cmake)
+endif()
+
 # ---[ Using cmake scripts and modules
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/Modules)
 
@@ -73,8 +121,7 @@ if(MSVC AND BUILD_SHARED_LIBS)
   message(WARNING "Some tests (solvers) will fail when building as a shared library with MSVC")
 endif()
 
-# ---[ Prebuild dependencies on windows
-include(cmake/WindowsDownloadPrebuiltDependencies.cmake)
+
 
 # ---[ Dependencies
 include(cmake/Dependencies.cmake)

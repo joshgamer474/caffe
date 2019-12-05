@@ -11,6 +11,7 @@
 #include "opencv2/core/core.hpp"
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
+#include "opencv2/core/version.hpp"
 
 #include "caffe/data_transformer.hpp"
 #include "caffe/internal_thread.hpp"
@@ -285,12 +286,19 @@ void WindowDataLayer<Dtype>::load_batch(Batch<Dtype>* batch) {
           image_database_[window[WindowDataLayer<Dtype>::IMAGE_INDEX]];
 
       cv::Mat cv_img;
+      int flags = 0;
       if (this->cache_images_) {
         pair<std::string, Datum> image_cached =
           image_database_cache_[window[WindowDataLayer<Dtype>::IMAGE_INDEX]];
         cv_img = DecodeDatumToCVMat(image_cached.second, true);
       } else {
-        cv_img = cv::imread(image.first, CV_LOAD_IMAGE_COLOR);
+#ifdef CV_MAJOR_VERSION > 2
+       // OpenCV 3.x, 4.x
+        flags = cv::IMREAD_COLOR;
+#else  // OpenCV 2.x
+        flags = CV_LOAD_IMAGE_COLOR;
+#endif // CV_MAJOR_VERSION
+        cv_img = cv::imread(image.first, flags);
         if (!cv_img.data) {
           LOG(ERROR) << "Could not open or find file " << image.first;
           return;
