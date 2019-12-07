@@ -3,13 +3,14 @@ import os
 
 class caffe(ConanFile):
     name = "caffe"
-    version = "0.0.1"
+    version = "1.0.0"
     license = ""
     url = ""
     options = {"shared": [True, False]}
     default_options = {"shared": False}
     generators = "cmake"
-    exports_sources = "include/*"
+    exports = "CMakeLists.txt"
+    exports_sources = "src/*", "include/*", "cmake/*", "data/*", "docker/*", "docs/*", "examples/*", "models/*", "python/*", "matlab/*", "tools/*"
     requires = (
         "atlas/0.7.0@worldforge/testing",
         "boost/1.71.0@conan/stable",
@@ -66,14 +67,11 @@ class caffe(ConanFile):
         cmake.definitions["CUDA_ARCH_BIN"] = "6.1"
         cmake.definitions["CUDA_ARCH_PTX"] = ""
 
-        cmake.definitions["NO_STRICT"] = ""
-        cmake.definitions["WIN32_LEAN_AND_MEAN"] = ""
-        cmake.definitions["NOMINMAX"] = ""
-        cmake.definitions["GLOG_NO_ABBREVIATED_SEVERITIES"] = ""
-
         cmake.configure()
         cmake.build()
 
     def package(self):
-        self.copy("*.h", dst="include", src="include")
-        self.copy("*.hpp", dst="include", src="include")
+        self.copy("caffe*", dst="include", src="include")
+        self.copy("*.hpp", dst="caffe", src="caffe")
+        self.copy("caffe*.lib", dst="lib", src="lib")
+        

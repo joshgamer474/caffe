@@ -34,6 +34,11 @@ if(USE_CONANFILE)
   # Force use HDF5
   add_compile_definitions(USE_HDF5)
 
+  add_compile_definitions(NO_STRICT)
+  add_compile_definitions(WIN32_LEAN_AND_MEAN)
+  add_compile_definitions(NOMINMAX)
+  add_compile_definitions(GLOG_NO_ABBREVIATED_SEVERITIES)
+
   set(GFLAGS_LIBRARY ${CONAN_LIBS_GFLAGS})
   set(GLOG_LIBRARY ${CONAN_LIBS_GLOG})
   set(glog_DIR ${CONAN_LIB_DIRS_GLOG})
@@ -62,8 +67,7 @@ if(USE_CONANFILE)
 
   find_package(Eigen3 REQUIRED)
 
-  link_libraries(PRIVATE
-    ${CONAN_TARGETS})
+  link_libraries(${CONAN_TARGETS})
 
 else()
   # ---[ Prebuild dependencies on windows
@@ -168,13 +172,13 @@ if(HAVE_CUDA)
 endif()
 
 # ---[ Subdirectories
-add_subdirectory(src/gtest)
+#add_subdirectory(src/gtest)
 add_subdirectory(src/caffe)
-add_subdirectory(tools)
-add_subdirectory(examples)
-add_subdirectory(python)
-add_subdirectory(matlab)
-add_subdirectory(docs)
+#add_subdirectory(tools)
+#add_subdirectory(examples)
+#add_subdirectory(python)
+#add_subdirectory(matlab)
+#add_subdirectory(docs)
 
 # ---[ Linter target
 add_custom_target(lint COMMAND ${CMAKE_COMMAND} -DPYTHON_EXECUTABLE=${PYTHON_EXECUTABLE} -P ${PROJECT_SOURCE_DIR}/cmake/lint.cmake)
