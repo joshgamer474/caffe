@@ -76,14 +76,14 @@ function(caffe_pickup_caffe_sources root)
   caffe_source_group("Source"         GLOB "${root}/src/caffe/*.cpp")
   caffe_source_group("Source\\Util"   GLOB "${root}/src/caffe/util/*.cpp")
   caffe_source_group("Source\\Layers" GLOB "${root}/src/caffe/layers/*.cpp")
-  caffe_source_group("Source\\Cuda"   GLOB "${root}/src/caffe/layers/*.cu")
-  caffe_source_group("Source\\Cuda"   GLOB "${root}/src/caffe/util/*.cu")
+  #caffe_source_group("Source\\Cuda"   GLOB "${root}/src/caffe/layers/*.cu")
+  #caffe_source_group("Source\\Cuda"   GLOB "${root}/src/caffe/util/*.cu")
   caffe_source_group("Source\\Proto"  GLOB "${root}/src/caffe/proto/*.proto")
 
   # source groups for test target
   caffe_source_group("Include"      GLOB "${root}/include/caffe/test/test_*.h*")
   caffe_source_group("Source"       GLOB "${root}/src/caffe/test/test_*.cpp")
-  caffe_source_group("Source\\Cuda" GLOB "${root}/src/caffe/test/test_*.cu")
+  #caffe_source_group("Source\\Cuda" GLOB "${root}/src/caffe/test/test_*.cu")
 
   # collect files
   file(GLOB test_hdrs    ${root}/include/caffe/test/test_*.h*)

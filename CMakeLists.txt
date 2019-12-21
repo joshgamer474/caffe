@@ -14,6 +14,63 @@ set(CAFFE_TARGET_VERSION "1.0.0-rc3" CACHE STRING "Caffe logical version")
 set(CAFFE_TARGET_SOVERSION "1.0.0-rc3" CACHE STRING "Caffe soname version")
 add_definitions(-DCAFFE_VERSION=${CAFFE_TARGET_VERSION})
 
+if(USE_CONANFILE)
+  include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+  conan_basic_setup()
+
+  set(CMAKE_PREFIX_PATH
+    ${CMAKE_PREFIX_PATH}
+    ${CONAN_PROTOBUF_ROOT}/cmake
+    ${CONAN_OPENCV_ROOT})
+
+  message("************************************")
+  message("CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
+  message("************************************")
+
+  # Force use HDF5
+  add_compile_definitions(USE_HDF5)
+
+  add_compile_definitions(NO_STRICT)
+  add_compile_definitions(WIN32_LEAN_AND_MEAN)
+  add_compile_definitions(NOMINMAX)
+  add_compile_definitions(GLOG_NO_ABBREVIATED_SEVERITIES)
+
+  set(GFLAGS_LIBRARY ${CONAN_LIBS_GFLAGS})
+  set(GLOG_LIBRARY ${CONAN_LIBS_GLOG})
+  set(glog_DIR ${CONAN_LIB_DIRS_GLOG})
+  find_package(Glog REQUIRED)
+  find_package(GFlags REQUIRED)
+
+  # This is needed to force the correct OpenCV to be found
+  set(OpenCV_DIR ${CONAN_OPENCV_ROOT}/cmake/x64/vc16/staticlib)
+  set(OpenCV_LIB_PATH ${CONAN_LIB_DIRS_OPENCV})
+  find_package(OpenCV REQUIRED)
+
+  set(Atlas_INCLUDE_DIR ${CONAN_INCLUDE_DIRS_ATLAS})
+  set(Atlas_LIBRARIES ${CONAN_LIBS_ATLAS})
+  set(Atlas_CLAPACK_INCLUDE_DIR ${CONAN_INCLUDE_DIRS_ATLAS})
+  set(Atlas_CBLAS_LIBRARY ${CONAN_LIBS_ATLAS})
+  set(Atlas_BLAS_LIBRARY ${CONAN_LIBS_ATLAS})
+  set(Atlas_LAPACK_LIBRARY ${CONAN_LIBS_ATLAS})
+  find_package(Atlas REQUIRED)
+
+  include(cmake/Utils.cmake)
+
+  set(PROTOBUF_LIBRARIES ${CONAN_LIBS_PROTOBUF})
+  set(Protobuf_LIBRARIES ${CONAN_LIBS_PROTOBUF})
+  set(Protobuf_INCLUDE_DIRS ${CONAN_LIB_DIRS_PROTOBUF})
+  find_package(Protobuf REQUIRED PROTOBUF_LIBRARIES Protobuf_LIBRARIES Protobuf_PROTOC_EXECUTABLE Protobuf_INCLUDE_DIRS)
+  include(cmake/ProtoBuf.cmake)
+
+  find_package(Eigen3 REQUIRED)
+
+  link_libraries(${CONAN_LIBS})
+
+else()
+  # ---[ Prebuild dependencies on windows
+  include(cmake/WindowsDownloadPrebuiltDependencies.cmake)
+endif()
+
 # ---[ Using cmake scripts and modules
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/Modules)
 
@@ -59,20 +116,20 @@ if(NOT MSVC) # rely on gtest header to determine what to do
 add_definitions(-DGTEST_USE_OWN_TR1_TUPLE)
 endif(NOT MSVC)
 
-if(MSVC AND BUILD_WITH_STATIC_CRT)
-  foreach(flag_var
-      CMAKE_C_FLAGS CMAKE_C_FLAGS_DEBUG CMAKE_C_FLAGS_RELEASE
-      CMAKE_C_FLAGS_MINSIZEREL CMAKE_C_FLAGS_RELWITHDEBINFO
-      CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
-      CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO)
-    if(${flag_var} MATCHES "/MD")
-      string(REGEX REPLACE "/MD" "/MT" ${flag_var} "${${flag_var}}")
-    endif(${flag_var} MATCHES "/MD")
-    if(${flag_var} MATCHES "/MDd")
-      string(REGEX REPLACE "/MDd" "/MTd" ${flag_var} "${${flag_var}}")
-    endif(${flag_var} MATCHES "/MDd")
-  endforeach(flag_var)
-endif()
+#if(MSVC AND BUILD_WITH_STATIC_CRT)
+#  foreach(flag_var
+#      CMAKE_C_FLAGS CMAKE_C_FLAGS_DEBUG CMAKE_C_FLAGS_RELEASE
+#      CMAKE_C_FLAGS_MINSIZEREL CMAKE_C_FLAGS_RELWITHDEBINFO
+#      CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
+#      CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO)
+#    if(${flag_var} MATCHES "/MD")
+#      string(REGEX REPLACE "/MD" "/MT" ${flag_var} "${${flag_var}}")
+#    endif(${flag_var} MATCHES "/MD")
+#    if(${flag_var} MATCHES "/MDd")
+#      string(REGEX REPLACE "/MDd" "/MTd" ${flag_var} "${${flag_var}}")
+#    endif(${flag_var} MATCHES "/MDd")
+#  endforeach(flag_var)
+#endif()
 
 # ---[ Warnings
 caffe_warnings_disable(CMAKE_CXX_FLAGS -Wno-sign-compare -Wno-uninitialized)
@@ -87,13 +144,13 @@ include_directories(BEFORE ${Caffe_INCLUDE_DIR} ${PROJECT_BINARY_DIR})
 include_directories(BEFORE src) # This is needed for gtest.
 
 # ---[ Subdirectories
-add_subdirectory(src/gtest)
+#add_subdirectory(src/gtest)
 add_subdirectory(src/caffe)
-add_subdirectory(tools)
-add_subdirectory(examples)
-add_subdirectory(python)
-add_subdirectory(matlab)
-add_subdirectory(docs)
+#add_subdirectory(tools)
+#add_subdirectory(examples)
+#add_subdirectory(python)
+#add_subdirectory(matlab)
+#add_subdirectory(docs)
 
 # ---[ Linter target
 if(MSVC)

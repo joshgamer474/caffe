@@ -1,7 +1,13 @@
 # generate protobuf sources
 file(GLOB proto_files proto/*.proto)
+message("******************************************")
+message("proto_gen_folder: ${proto_gen_folder}")
+message("******************************************")
 caffe_protobuf_generate_cpp_py(${proto_gen_folder} proto_srcs proto_hdrs proto_python ${proto_files})
 
+message("******************************************")
+message("CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
+message("******************************************")
 # include python files either to force generation
 add_library(proto STATIC ${proto_hdrs} ${proto_srcs} ${proto_python})
 set(Caffe_LINKER_LIBS proto ${Caffe_LINKER_LIBS}) # note, crucial to prepend!
@@ -51,7 +57,7 @@ endif()
 configure_file("${PROJECT_SOURCE_DIR}/cmake/Templates/export.hpp.in" 
                 ${export_header} @ONLY)
 # define preprocessor macro so that we will not include the generated forcelink header
-target_compile_definitions(caffe PRIVATE -DBUILDING_CAFFE_LIB)
+target_compile_definitions(caffe PRIVATE -DBUILDING_CAFFE_LIB --allow-multiple-definition)
 
 # ---[ Tests
  add_subdirectory(test)

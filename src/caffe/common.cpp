@@ -79,7 +79,6 @@ Caffe::~Caffe() { }
 
 void Caffe::set_mode(Brew mode) {
   Get(mode).mode_ = mode;
-  init_cu_handle();
 }
 
 void Caffe::set_random_seed(const unsigned int seed) {
