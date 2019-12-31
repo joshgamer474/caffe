@@ -21,7 +21,7 @@ namespace caffe {
  * TODO(dox): more thorough description.
  */
 template <typename Dtype>
-class Net {
+class __declspec(dllexport) Net {
  public:
   explicit Net(const NetParameter& param, const Net* root_net = NULL);
   explicit Net(const string& param_file, Phase phase,
@@ -111,14 +111,14 @@ class Net {
    * @brief For an already initialized net, copies the pre-trained layers from
    *        another Net.
    */
-  void CopyTrainedLayersFrom(const NetParameter& param);
-  void CopyTrainedLayersFrom(const string trained_filename);
-  void CopyTrainedLayersFromBinaryProto(const string trained_filename);
-  void CopyTrainedLayersFromHDF5(const string trained_filename);
+   void CopyTrainedLayersFrom(const NetParameter& param);
+   void CopyTrainedLayersFrom(const string trained_filename);
+   void CopyTrainedLayersFromBinaryProto(const string trained_filename);
+   void CopyTrainedLayersFromHDF5(const string trained_filename);
   /// @brief Writes the net to a proto.
-  void ToProto(NetParameter* param, bool write_diff = false) const;
+   void ToProto(NetParameter* param, bool write_diff = false) const;
   /// @brief Writes the net to an HDF5 file.
-  void ToHDF5(const string& filename, bool write_diff = false) const;
+   void ToHDF5(const string& filename, bool write_diff = false) const;
 
   /// @brief returns the network name.
   inline const string& name() const { return name_; }

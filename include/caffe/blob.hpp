@@ -21,7 +21,7 @@ namespace caffe {
  * TODO(dox): more thorough description.
  */
 template <typename Dtype>
-class Blob {
+class __declspec(dllexport) Blob {
  public:
   Blob()
        : data_(), diff_(), count_(0), capacity_(0) {}
@@ -32,7 +32,7 @@ class Blob {
   explicit Blob(const vector<int>& shape);
 
   /// @brief Deprecated; use <code>Reshape(const vector<int>& shape)</code>.
-  void Reshape(const int num, const int channels, const int height,
+   void Reshape(const int num, const int channels, const int height,
       const int width);
   /**
    * @brief Change the dimensions of the blob, allocating new memory if
@@ -48,9 +48,9 @@ class Blob {
    * an error; either Net::Forward or Net::Reshape need to be called to
    * propagate the new input shape to higher layers.
    */
-  void Reshape(const vector<int>& shape);
-  void Reshape(const BlobShape& shape);
-  void ReshapeLike(const Blob& other);
+   void Reshape(const vector<int>& shape);
+   void Reshape(const BlobShape& shape);
+   void ReshapeLike(const Blob& other);
   inline string shape_string() const {
     ostringstream stream;
     for (int i = 0; i < shape_.size(); ++i) {
