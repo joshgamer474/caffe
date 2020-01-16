@@ -29,10 +29,18 @@ class caffe(ConanFile):
         "protoc_installer/3.5.1@bincrafters/stable",
     )
 
+    def imports(self):
+        dest = os.getenv("CONAN_IMPORT_PATH", "bin")
+        self.copy("*.dll", dst=dest, root_package="opencv", keep_path=False)
+        self.copy("*.dll", src="bin", dst=dest)
+        self.copy("*.pdb", src="bin", dst=dest)
+        self.keep_imports = True
+
     def configure(self):
         self.source()
 
-        self.options["boost"].shared = self.options.shared
+        #self.options["boost"].shared = self.options.shared
+        self.options["boost"].shared = True
         #self.options["boost"].header_only = True
         self.options["boost"].skip_lib_rename = True
 
