@@ -57,7 +57,7 @@ endif()
 configure_file("${PROJECT_SOURCE_DIR}/cmake/Templates/export.hpp.in" 
                 ${export_header} @ONLY)
 # define preprocessor macro so that we will not include the generated forcelink header
-target_compile_definitions(caffe PRIVATE -DBUILDING_CAFFE_LIB --allow-multiple-definition)
+target_compile_definitions(caffe PRIVATE -DBUILDING_CAFFE_LIB -D_HAS_AUTO_PTR_ETC)# --allow-multiple-definition)
 
 # ---[ Tests
  add_subdirectory(test)

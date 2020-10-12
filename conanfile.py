@@ -8,9 +8,11 @@ class caffe(ConanFile):
     url = "https://github.com/BVLC/caffe"
     settings = "os", "compiler", "build_type", "arch"
     options = {"shared": [True, False],
-               "cpu_only": [True, False]}
+               "cpu_only": [True, False],
+               "cuda_arch_name": ["Fermi", "Kepler", "Maxwell", "All", "Auto"]}
     default_options = {"shared": True,
-                       "cpu_only": False}
+                       "cpu_only": False,
+                       "cuda_arch_name": "Auto"}
     generators = "cmake"
     exports = "CMakeLists.txt"
     exports_sources = "src/*", "include/*", "cmake/*", "data/*", "docker/*", "docs/*", "examples/*", "models/*", "python/*", "matlab/*", "tools/*"
@@ -70,6 +72,7 @@ class caffe(ConanFile):
         self.options["opencv"].shared = self.options.shared
 
         self.options["hdf5"].cxx = True
+        self.options["hdf5"].parallel = False
         self.options["hdf5"].shared = self.options.shared
 
         self.options["zlib"].shared = self.options.shared
@@ -84,7 +87,8 @@ class caffe(ConanFile):
         cmake.definitions["USE_LMDB"] = False
         cmake.definitions["USE_LEVELDB"] = False
         cmake.definitions["BUILD_python"] = False
-        cmake.definitions["CUDA_ARCH_BIN"] = "6.1" # https://en.wikipedia.org/wiki/CUDA
+        cmake.definitions["CUDA_ARCH_NAME"] = self.options.cuda_arch_name
+        #cmake.definitions["CUDA_ARCH_BIN"] = "6.1" # https://en.wikipedia.org/wiki/CUDA
         cmake.definitions["CUDA_ARCH_PTX"] = ""
 
         cmake.configure()

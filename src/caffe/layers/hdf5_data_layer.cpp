@@ -6,7 +6,10 @@ TODO:
   :: don't forget to update hdf5_daa_layer.cu accordingly
 - add ability to shuffle filenames if flag is set
 */
+
+#include <algorithm>
 #include <fstream>  // NOLINT(readability/streams)
+#include <memory>
 #include <string>
 #include <vector>
 
